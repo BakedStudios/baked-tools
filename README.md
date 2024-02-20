@@ -9,6 +9,6 @@ Documentation: (requires login)
 
 >Delivery Sync: https://baked.discourse.group/t/documentation-delivery-sync/77
 
->tidbyt-sg-monitor: https://baked.discourse.group/t/documentation-tidbyt-sg-monitor/138
+>Tidbyt SG Monitor: https://baked.discourse.group/t/documentation-tidbyt-sg-monitor/138
 
 >Webhooks: https://baked.discourse.group/t/documentation-webhooks-service-sheet-sync/18
