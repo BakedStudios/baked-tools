@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+      /* Existing styles remain unchanged */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 15px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      input[type="button"] {
+        background-color: #e2107e;
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      input[type="button"]:hover {
+        background-color: #c10e6c;
+      }
+      textarea, input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+      #workingMessage {
+        display: none; /* Initially hidden */
+        margin-top: 10px;
+      }
+    </style>
+</head>
+<body>
+    <form id="submitForm">
+      <div class="form-group">
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" name="projectName">
+      </div>
+      <div class="form-group">
+        <label for="details">Submission Details/Notes:</label>
+        <textarea id="details" name="details"></textarea>
+      </div>
+      <input type="button" value="Submit" onclick="submitForm()">
+      <div id="workingMessage">Working...</div> <!-- Working message added here -->
+    </form>
+
+    <script>
+      function submitForm() {
+        var formObject = {
+          projectName: document.getElementById('projectName').value,
+          details: document.getElementById('details').value
+        };
+        document.getElementById('workingMessage').style.display = 'block'; // Show the working message
+        google.script.run
+          .withSuccessHandler(function() {
+              google.script.host.close(); // This line closes the dialog upon success
+          })
+          .processForm(formObject);
+      }
+    </script>
+</body>
+</html>
