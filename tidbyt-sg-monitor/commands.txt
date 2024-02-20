@@ -1,0 +1,5 @@
+To start:
+sudo launchctl bootstrap gui/$(id -u) /Applications/Tidbyt/com.Tidbyt.SG_Data.plist
+
+To end:
+launchctl bootout gui/$(id -u) /Applications/Tidbyt/com.Tidbyt.SG_Data.plist       
