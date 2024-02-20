@@ -7,7 +7,7 @@ import subprocess
 # Define your ShotGrid server and script credentials
 SHOTGUN_URL = 'https://baked.shotgunstudio.com'
 SCRIPT_NAME = 'Tidbyt'
-SCRIPT_KEY = 'vtwnfanavajaer^tjeclzO8ek'
+SCRIPT_KEY = 'REMOVED'
 
 # Connect to ShotGrid
 sg = shotgun_api3.Shotgun(SHOTGUN_URL, SCRIPT_NAME, SCRIPT_KEY)
@@ -58,7 +58,7 @@ def main():
 starlark_code = STARLARK_TEMPLATE.format(MESSAGE)
 
 # Write the Starlark code to a .star file
-with open('/Applications/Tidbyt/generated_script.star', 'w') as file:
+with open('/Applications/tidbyt-sg-monitor/generated_script.star', 'w') as file:
     file.write(starlark_code)
 
 # Define a function to run terminal commands in a specified directory
@@ -74,7 +74,7 @@ def run_command_in_directory(command, directory):
         return None
 
 # Navigate to the required directory and run the commands
-tidbyt_directory = os.path.expanduser("/Applications/Tidbyt")  # Adjust path if necessary
+tidbyt_directory = os.path.expanduser("/Applications/tidbyt-sg-monitor")  # Adjust path if necessary
 
 run_command_in_directory("/usr/local/bin/pixlet render generated_script.star", tidbyt_directory)
-run_command_in_directory("/usr/local/bin/pixlet push benignly-hopeful-righteous-capuchin-afd generated_script.webp", tidbyt_directory)
+run_command_in_directory("/usr/local/bin/pixlet push <YOUR TIDBYT TOKEN HERE>", tidbyt_directory)

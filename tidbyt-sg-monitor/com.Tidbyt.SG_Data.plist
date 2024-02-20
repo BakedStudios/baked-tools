@@ -9,17 +9,17 @@
     <key>ProgramArguments</key>
     <array>
         <string>/usr/local/bin/python3</string>
-        <string>/Applications/Tidbyt/SG_Data.py</string>
+        <string>/Applications/tidbyt-sg-monitor/SG_Data.py</string>
     </array>
     
     <key>StartInterval</key>
     <integer>30</integer>
     
     <key>StandardOutPath</key>
-    <string>/Applications/Tidbyt/com.Tidbyt.SG_Data.out</string>
+    <string>/Applications/tidbyt-sg-monitor/com.Tidbyt.SG_Data.out</string>
     
     <key>StandardErrorPath</key>
-    <string>/Applications/Tidbyt/com.Tidbyt.SG_Data.err</string>
+    <string>/Applications/tidbyt-sg-monitor/com.Tidbyt.SG_Data.err</string>
     
     <key>RunAtLoad</key>
     <true/>
