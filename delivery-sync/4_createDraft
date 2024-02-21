@@ -1,23 +1,4 @@
 
-// To learn how to use this script, refer to the documentation:
-// https://developers.google.com/apps-script/samples/automations/mail-merge
-
-/*
-Copyright 2022 Martin Hawksey
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
- 
 /**
  * @OnlyCurrentDoc
 */
@@ -27,7 +8,7 @@ limitations under the License.
  * recipient addresses and email sent column.
 */
 const RECIPIENT_COL  = "Recipient";
-const EMAIL_SENT_COL = "Email Sent";
+const EMAIL_SENT_COL = "Draft Created";
 /** 
  */
 /**
@@ -35,20 +16,9 @@ const EMAIL_SENT_COL = "Email Sent";
  * @param {string} subjectLine (optional) for the email draft message
  * @param {Sheet} sheet to read data from
 */
-function sendEmails(sheetName){
+function createDraft(sheetName){
   // Select correct worksheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-
-  // Select Value and BKD warning
-  const cellE2Value = sheet.getRange("E2").getValue();
-  const cellF2Value = sheet.getRange("F2").getValue();
-  const cellA2Value = sheet.getRange("A2").getValue();
-
-  if(cellE2Value.includes("Select Value") || cellF2Value.includes("Select Value")) {
-    const ui = SpreadsheetApp.getUi();
-    ui.alert('Warning', 'Either Emailer cells E2 or F2 contain "Select Value", or cell A2 does not contain BKD. Please update before sending emails.', ui.ButtonSet.OK);
-    return; // Exit the function
-  }
 
   // option to skip browser prompt if you want to use this code in other projects
   const subjectLine = "{{SL}}";
@@ -75,12 +45,12 @@ function sendEmails(sheetName){
   // For a pretty version, see https://mashe.hawksey.info/?p=17869/#comment-184945
   const obj = data.map(r => (heads.reduce((o, k, i) => (o[k] = r[i] || '', o), {})));
 
-  // Creates an array to record sent emails
+  // Creates an array to record created drafts
   const out = [];
 
   // Loops through all the rows of data
   obj.forEach(function(row, rowIdx){
-    // Only sends emails if email_sent cell is blank and not hidden by a filter
+    // Only create drafts if cell is blank and not hidden by a filter
     if (row[EMAIL_SENT_COL] == ''){
       try {
         const msgObj = fillInTemplateFromObject_(emailTemplate.message, row);
@@ -88,7 +58,7 @@ function sendEmails(sheetName){
         // See https://developers.google.com/apps-script/reference/gmail/gmail-app#sendEmail(String,String,String,Object)
         // If you need to send emails with unicode/emoji characters change GmailApp for MailApp
         // Uncomment advanced parameters as needed (see docs for limitations)
-        GmailApp.sendEmail(row[RECIPIENT_COL], msgObj.subject, msgObj.text, {
+        MailApp.createDraft(row[RECIPIENT_COL], msgObj.subject, msgObj.text, {
           htmlBody: msgObj.html,
           // bcc: 'a.bbc@email.com',
           // cc: 'a.cc@email.com',
@@ -203,90 +173,4 @@ function sendEmails(sheetName){
       .replace(/[\r]/g, '\\r')
       .replace(/[\t]/g, '\\t');
   };
-}
-
-function sendTest(sheetName){
- // Select correct worksheet
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-
-  // Select Value and BKD warning
-  const cellE2Value = sheet.getRange("E2").getValue();
-  const cellF2Value = sheet.getRange("F2").getValue();
-  const cellA2Value = sheet.getRange("A2").getValue();
-
-  if(cellE2Value.includes("Select Value") || cellF2Value.includes("Select Value")) {
-    const ui = SpreadsheetApp.getUi();
-    ui.alert('Warning', 'Either Emailer cells E2 or F2 contain "Select Value", or cell A2 does not contain BKD. Please update before sending emails.', ui.ButtonSet.OK);
-    return; // Exit the function
-  }
-
-  const subjectLine = "{{SL}}";
-  const emailTemplate = getGmailTemplateFromDrafts_(subjectLine);
-  const dataRange = sheet.getDataRange();
-  const data = dataRange.getDisplayValues();
-  const heads = data.shift(); 
-  const emailSentColIdx = heads.indexOf(EMAIL_SENT_COL);
-  const obj = data.map(r => (heads.reduce((o, k, i) => (o[k] = r[i] || '', o), {})));
-
-  const firstRow = obj[0];
-  if (firstRow[EMAIL_SENT_COL] === '') {
-    try {
-      const msgObj = fillInTemplateFromObject_(emailTemplate.message, firstRow);
-      GmailApp.sendEmail('coordinator@wearebaked.com', msgObj.subject, msgObj.text, {
-        htmlBody: msgObj.html,
-        attachments: emailTemplate.attachments,
-        inlineImages: emailTemplate.inlineImages
-      });
-    } catch(e) {
-      console.error(e.message);
-    }
-  }
-
-  function getGmailTemplateFromDrafts_(subject_line){
-    try {
-      const drafts = GmailApp.getDrafts();
-      const draft = drafts.filter(subjectFilter_(subject_line))[0];
-      const msg = draft.getMessage();
-      const allInlineImages = draft.getMessage().getAttachments({includeInlineImages: true,includeAttachments:false});
-      const attachments = draft.getMessage().getAttachments({includeInlineImages: false});
-      const htmlBody = msg.getBody(); 
-      const img_obj = allInlineImages.reduce((obj, i) => (obj[i.getName()] = i, obj) ,{});
-      const imgexp = RegExp('<img.*?src="cid:(.*?)".*?alt="(.*?)"[^\>]+>', 'g');
-      const matches = [...htmlBody.matchAll(imgexp)];
-      const inlineImagesObj = {};
-      matches.forEach(match => inlineImagesObj[match[1]] = img_obj[match[2]]);
-      return {message: {subject: subject_line, text: msg.getPlainBody(), html:htmlBody}, 
-              attachments: attachments, inlineImages: inlineImagesObj };
-    } catch(e) {
-      throw new Error("Oops - can't find Gmail draft");
-    }
-
-    function subjectFilter_(subject_line){
-      return function(element) {
-        if (element.getMessage().getSubject() === subject_line) {
-          return element;
-        }
-      }
-    }
-  }
-  
-  function fillInTemplateFromObject_(template, data) {
-    let template_string = JSON.stringify(template);
-    template_string = template_string.replace(/{{[^{}]+}}/g, key => {
-      return escapeData_(data[key.replace(/[{}]+/g, "")] || "");
-    });
-    return JSON.parse(template_string);
-  }
-
-  function escapeData_(str) {
-    return str
-      .replace(/[\\]/g, '\\\\')
-      .replace(/[\"]/g, '\\\"')
-      .replace(/[\/]/g, '\\/')
-      .replace(/[\b]/g, '\\b')
-      .replace(/[\f]/g, '\\f')
-      .replace(/[\n]/g, '\\n')
-      .replace(/[\r]/g, '\\r')
-      .replace(/[\t]/g, '\\t');
-  }
 }
