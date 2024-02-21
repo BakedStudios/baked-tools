@@ -58,7 +58,7 @@ function createDraft(sheetName){
         // See https://developers.google.com/apps-script/reference/gmail/gmail-app#sendEmail(String,String,String,Object)
         // If you need to send emails with unicode/emoji characters change GmailApp for MailApp
         // Uncomment advanced parameters as needed (see docs for limitations)
-        MailApp.createDraft(row[RECIPIENT_COL], msgObj.subject, msgObj.text, {
+        GmailApp.createDraft(row[RECIPIENT_COL], msgObj.subject, msgObj.text, {
           htmlBody: msgObj.html,
           // bcc: 'a.bbc@email.com',
           // cc: 'a.cc@email.com',
