@@ -3,17 +3,15 @@ function showCustomDialog() {
   var html = HtmlService.createHtmlOutputFromFile('DialogForm')
       .setWidth(400)
       .setHeight(300);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Sync for Delivery');
+  SpreadsheetApp.getUi().showModalDialog(html, 'Sync Items From SG');
 }
 
 // Function to process form data from the custom dialog
 function processForm(formObject) {
   var projectName = formObject.projectName;
-  var details = formObject.details;
 
   //set details
   var sheet = SpreadsheetApp.getActiveSheet();
-  sheet.getRange('Emailer!G2').setValue(details);
 
   //set URL
   var ss = SpreadsheetApp.getActiveSpreadsheet();

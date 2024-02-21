@@ -1,3 +1,23 @@
+function showEmailDraftDialog() {
+  var html = HtmlService.createHtmlOutputFromFile('EmailForm')
+      .setWidth(400)
+      .setHeight(300);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Create Draft Email');
+}
+
+//add form entry to sheet
+function processEmailForm(formObject) {
+var details = formObject.details;
+var sheet = SpreadsheetApp.getActiveSheet();
+
+sheet.getRange('Emailer!G2').setValue(details);
+
+//trigger draft creation
+createDraft("Emailer")
+}
+
+
+
 
 /**
  * @OnlyCurrentDoc

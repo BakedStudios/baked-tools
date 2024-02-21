@@ -3,7 +3,7 @@
 <head>
     <base target="_top">
     <style>
-      /* Existing styles remain unchanged */
+      /* Styles adjusted to remove project name specific styling */
       body {
         font-family: Arial, sans-serif;
         margin: 15px;
@@ -23,7 +23,7 @@
       input[type="button"]:hover {
         background-color: #c10e6c;
       }
-      input[type="text"] {
+      textarea {
         width: 100%;
         padding: 10px;
         margin-top: 5px;
@@ -40,8 +40,8 @@
 <body>
     <form id="submitForm">
       <div class="form-group">
-        <label for="projectName">Project Name:</label>
-        <input type="text" id="projectName" name="projectName">
+        <label for="details">Submission Details/Notes:</label>
+        <textarea id="details" name="details"></textarea>
       </div>
       <input type="button" value="Submit" onclick="submitForm()">
       <div id="workingMessage">Working...</div> <!-- Working message added here -->
@@ -50,14 +50,14 @@
     <script>
       function submitForm() {
         var formObject = {
-          projectName: document.getElementById('projectName').value
+          details: document.getElementById('details').value
         };
         document.getElementById('workingMessage').style.display = 'block'; // Show the working message
         google.script.run
           .withSuccessHandler(function() {
               google.script.host.close(); // This line closes the dialog upon success
           })
-          .processForm(formObject);
+          .processEmailForm(formObject);
       }
     </script>
 </body>

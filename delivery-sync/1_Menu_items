@@ -12,7 +12,7 @@ function createDraftTest() {
   // Attempt to run the function, handle prerequisites check
   const errorMessage = checkPrerequisites();
   if (errorMessage === '') {
-    createDraft("Emailer");
+    showEmailDraftDialog();
   } else {
     // Show specific error message based on what is missing
     SpreadsheetApp.getUi().alert(errorMessage);
