@@ -16,9 +16,6 @@ sheet.getRange('Emailer!G2').setValue(details);
 createDraft("Emailer")
 }
 
-
-
-
 /**
  * @OnlyCurrentDoc
 */
@@ -37,15 +34,27 @@ const EMAIL_SENT_COL = "Draft Created";
  * @param {Sheet} sheet to read data from
 */
 function createDraft(sheetName){
-  // Select correct worksheet
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
-  // option to skip browser prompt if you want to use this code in other projects
-  const subjectLine = "{{SL}}";
+    // Select correct worksheet
+  const submissionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Submission");
+
+  // Retrieve the value from cell E3 of the "Submission" sheet
+  const cellValue = submissionSheet.getRange('E3').getValue();
+
+  // Determine the subjectLine based on the value in cell E3
+  const subjectLine = cellValue === "delivery" ? "{{SL2}}" : "{{SL1}}";
 
   // Gets the draft Gmail message to use as a template
   const emailTemplate = getGmailTemplateFromDrafts_(subjectLine);
+  // Select correct worksheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   
+if (subjectLine === "{{SL2}}") {
+  sheet.getRange('A1').setValue("SL2");
+} else {
+  sheet.getRange('A1').setValue("SL1");
+}
+
   // Gets the data from the passed sheet
   const dataRange = sheet.getDataRange();
   // Fetches displayed values for each row in the Range HT Andrew Roberts 
