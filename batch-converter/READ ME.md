@@ -1,6 +1,4 @@
-Hi
-
-Welcome to batch converter
+## Batch Converter
 
 This app is designed to help convert files from one codec/container to the other in our Baked Pipeline.
 
