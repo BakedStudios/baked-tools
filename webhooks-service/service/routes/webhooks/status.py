@@ -20,6 +20,7 @@ bp = Blueprint("status", __name__)
 
 
 def validation_error_response(validation_error):
+    # Generates a validation error response with a description.
     return {
         "error": "Validation Error",
         "description": str(validation_error),
@@ -27,6 +28,7 @@ def validation_error_response(validation_error):
 
 
 def unknown_status_error_response(unknown_status_error):
+    # Generates an unknown status error response with a description.
     return {
         "error": "Unknown Status",
         "description": str(unknown_status_error),
@@ -35,6 +37,7 @@ def unknown_status_error_response(unknown_status_error):
 
 @bp.before_request
 def ensure_request_from_shotgrid():
+    # Ensures that the request contains a valid Shotgrid signature.
     if "x-sg-signature" not in request.headers:
         return {
             "error": "Authentication Error",
@@ -53,6 +56,7 @@ def ensure_request_from_shotgrid():
 
 @bp.before_request
 def handle_webhook():
+    # Parses the webhook request body and stores it in the application context.
     post_body = request.get_json()
 
     try:
@@ -70,42 +74,8 @@ def handle_webhook():
 @bp.route("/task", methods=("POST",))
 def handle_task_status_change():
     """
-    Receives e.g. the following JSON post body:
-
-    {
-      "data": {
-        "id": "702994.82192.0",
-        "event_log_entry_id": 3674504,
-        "event_type": "Shotgun_Task_Change",
-        "operation": "update",
-        "user": {
-          "type": "HumanUser",
-          "id": 1346
-        },
-        "entity": {
-          "type": "Task",
-          "id": 23802
-        },
-        "project": {
-          "type": "Project",
-          "id": 2817
-        },
-        "meta": {
-          "type": "attribute_change",
-          "attribute_name": "sg_status_list",
-          "entity_type": "Task",
-          "entity_id": 23802,
-          "field_data_type": "status_list",
-          "old_value": "di",
-          "new_value": "rdy"
-        },
-        "created_at": "2023-04-30 15:49:00.426711",
-        "attribute_name": "sg_status_list",
-        "session_uuid": "32046296-e76d-11ed-ba10-0242ac110003",
-        "delivery_id": "c5591b71-7a59-4326-8579-a9e2dd32b8f4"
-      },
-      "timestamp": "2023-04-30T15:49:01Z"
-    }
+    Endpoint to handle status changes of tasks in Shotgrid.
+    It updates the linked shot status based on the new task status.
     """
     task_id = g.webhook.data.entity.id
     project_id = g.webhook.data.project.id
@@ -157,40 +127,9 @@ def handle_task_status_change():
 @bp.route("/version", methods=("POST",))
 def handle_version_status_change():
     """
-    {
-      "data": {
-        "id": "771230.141915.0",
-        "meta": {
-          "type": "attribute_change",
-          "entity_id": 46898,
-          "new_value": "note",
-          "old_value": "cnv",
-          "entity_type": "Version",
-          "attribute_name": "sg_status_list",
-          "field_data_type": "status_list"
-        },
-        "user": {
-          "id": 1346,
-          "type": "HumanUser"
-        },
-        "entity": {
-          "id": 46898,
-          "type": "Version"
-        },
-        "project": {
-          "id": 2817,
-          "type": "Project"
-        },
-        "operation": "update",
-        "created_at": "2023-05-22 17:40:39.834737",
-        "event_type": "Shotgun_Version_Change",
-        "delivery_id": "222d1fd2-07b9-4225-a696-e4c617de8e8d",
-        "session_uuid": "bb303728-f8c7-11ed-9945-0242ac110004",
-        "attribute_name": "sg_status_list",
-        "event_log_entry_id": 3842748
-      },
-      "timestamp": "2023-05-22T17:40:40Z"
-    }
+    Endpoint to handle status changes of versions in Shotgrid.
+    It updates the linked task status based on the new version status and,
+    if necessary, the linked shot status as well.
     """
     version_id = g.webhook.data.entity.id
     project_id = g.webhook.data.project.id
@@ -259,37 +198,8 @@ def handle_version_status_change():
 @bp.route("/version-created", methods=("POST",))
 def handle_version_created():
     """
-    {
-      "data": {
-        "id": "798477.150082.0",
-        "event_log_entry_id": 3980684,
-        "event_type": "Shotgun_Version_New",
-        "operation": "create",
-        "user": {
-          "type": "HumanUser",
-          "id": 1346
-        },
-        "entity": {
-          "type": "Version",
-          "id": 47971
-        },
-        "project": {
-          "type": "Project",
-          "id": 2817
-        },
-        "meta": {
-          "type": "new_entity",
-          "entity_type": "Version",
-          "entity_id": 47971
-        },
-        "created_at": "2023-06-21 01:39:15.647563",
-        "attribute_name": null,
-        "session_uuid": "2f5fab2e-0fd4-11ee-a1de-0242ac110003",
-        "delivery_id": "5171371f-f36a-4111-ad63-b4b594ee5cbc"
-      },
-      "timestamp": "2023-06-21T01:39:16Z"
-    }
-
+    Endpoint to handle the creation of versions in Shotgrid.
+    It updates the linked task status based on the version's initial status.
     """
     version_id = g.webhook.data.entity.id
     project_id = g.webhook.data.project.id

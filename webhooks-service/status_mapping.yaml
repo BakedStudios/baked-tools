@@ -1,26 +1,26 @@
-shot_statuses:
-  - key: omt
-    label: Omit
-  - key: bid
-    label: Bidding
-  - key: hld
-    label: On Hold
-  - key: repull
-    label: Re-Pull
-  - key: media
-    label: Awaiting Media
-  - key: awa
-    label: Awaiting Assignment
-  - key: actv
-    label: Active
+version_statuses:
+  - key: na
+    label: N/A
+  - key: cnv
+    label: Check New Version
+  - key: bkdn
+    label: BKD Note
+  - key: stcomp
+    label: Step Completed
+  - key: sndwip
+    label: Send WIP
+  - key: sndcli
+    label: Sent to Client
+  - key: qckbk
+    label: QC Kickback
   - key: rev
     label: Pending Client Review
+  - key: note
+    label: Client Note
+  - key: hero
+    label: Hero Shot
   - key: apv
     label: Client Approved
-  - key: di
-    label: Delivered to DI
-  - key: final
-    label: Final
 
 task_statuses:
   - key: omt
@@ -58,57 +58,51 @@ task_statuses:
   - key: di
     label: Delivered to DI
 
-version_statuses:
-  - key: na
-    label: N/A
-  - key: cnv
-    label: Check New Version
-  - key: bkdn
-    label: BKD Note
-  - key: stcomp
-    label: Step Completed
-  - key: sndwip
-    label: Send WIP
-  - key: sndcli
-    label: Sent to Client
-  - key: qckbk
-    label: QC Kickback
+shot_statuses:
+  - key: omt
+    label: Omit
+  - key: bid
+    label: Bidding
+  - key: hld
+    label: On Hold
+  - key: repull
+    label: Re-Pull
+  - key: media
+    label: Awaiting Media
+  - key: awa
+    label: Awaiting Assignment
+  - key: actv
+    label: Active
   - key: rev
     label: Pending Client Review
-  - key: note
-    label: Client Note
-  - key: hero
-    label: Hero Shot
   - key: apv
     label: Client Approved
+  - key: di
+    label: Delivered to DI
+  - key: final
+    label: Final
 
-shot_to_task:
-  omt:
-    - omt
-  bid:
-    - wtg
-  hld:
-    - hld
-  repull:
-    - wtg
-  media:
-    - wtg
-  awa:
-    - wtg
-  actv:
-    - rdy
-    - per
-    - ip
-    - ncl
-    - ofr
-    - bfr
-    - stcomp
+version_to_task:
+  cnv:
     - cnv
-    - sndcli
+  bkdn:
     - adn
+  stcomp:
+    - stcomp
+  sndwip:
+    - sndcli
+  sndcli:
+    - sndcli
+  qckbk:
     - qckbk
-  di:
-    - di
+  rev:
+    - rev
+  note:
+    - adn
+  hero:
+    - apv
+  apv:
+    - apv
 
 task_to_shot:
   omt:
@@ -143,25 +137,3 @@ task_to_shot:
     - apv
   di:
     - di
-
-version_to_task:
-  cnv:
-    - cnv
-  bkdn:
-    - adn
-  stcomp:
-    - stcomp
-  sndwip:
-    - sndcli
-  sndcli:
-    - sndcli
-  qckbk:
-    - qckbk
-  rev:
-    - rev
-  note:
-    - adn
-  hero:
-    - apv
-  apv:
-    - apv

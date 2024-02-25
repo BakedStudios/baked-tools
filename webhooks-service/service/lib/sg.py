@@ -193,38 +193,6 @@ class SG:
         return self._api.update("Version", version_id, data)
 
 
-def update_linked_tasks(project_id, shot_id, valid_task_statuses):
-    """
-    For the given shot, finds all linked tasks and updates their status.
-
-    If a linked task already has a status in the list valid_task_statuses, the
-    linked task is not updated. Otherwise, the linked task has its status
-    updated to the first status in valid_task_statuses.
-
-    Returns a tuple with the list of original tasks and a list of tasks that
-    were updated.
-    """
-    sg = SG()
-    shot = sg.find_shot(shot_id)
-
-    linked_task_ids = [t["id"] for t in shot["tasks"]]
-    if not linked_task_ids:
-        logger.warn(f"No linked tasks found for shot {shot_id}.")
-        return [], []
-
-    linked_tasks = sg.find_tasks(linked_task_ids)
-    tasks_to_update = [
-        t for t in linked_tasks
-        if not t["sg_status_list"] in valid_task_statuses
-    ]
-
-    updated_tasks = sg.set_task_status(
-        (t["id"] for t in tasks_to_update),
-        valid_task_statuses[0]
-    )
-    return tasks_to_update, updated_tasks
-
-
 def update_linked_shot(project_id, task_id, valid_shot_statuses):
     """
     For the given task, finds the linked shot and updates its status.
