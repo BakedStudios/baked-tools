@@ -4,5 +4,3 @@
 #
 #    pip-compile dev-requirements.in
 #
-graphviz==0.20.1
-    # via -r dev-requirements.in

@@ -41,63 +41,46 @@ task_statuses:
     label: Out For Roto/Paint
   - key: bfr
     label: Back From Roto/Paint
-  - key: stcomp
-    label: Step Completed
   - key: cnv
     label: Check New Version
-  - key: sndcli
-    label: Send to Client
   - key: adn
     label: Address New Notes
+  - key: stcomp
+    label: Step Completed
+  - key: sndcli
+    label: Send to Client
   - key: qckbk
-    label: QC Clickback
+    label: QC Kickback
   - key: rev
     label: Pending Client Review
   - key: apv
     label: Client Approved
   - key: di
     label: Delivered to DI
-  - key: rff
-    label: Ready for Formats
-  - key: rqc
-    label: Ready for QC
-  - key: sto
-    label: Send to Online
-  - key: por
-    label: Pending Online Review
-
 
 version_statuses:
   - key: na
     label: N/A
   - key: cnv
     label: Check New Version
-  - key: sndcli
-    label: Sent to Client
   - key: bkdn
     label: BKD Note
+  - key: stcomp
+    label: Step Completed
+  - key: sndwip
+    label: Send WIP
+  - key: sndcli
+    label: Sent to Client
   - key: qckbk
     label: QC Kickback
   - key: rev
     label: Pending Client Review
   - key: note
     label: Client Note
-  - key: stcomp
-    label: Step Completed
   - key: hero
     label: Hero Shot
   - key: apv
     label: Client Approved
-  - key: rff
-    label: Ready for Formats
-  - key: rqc
-    label: Ready for QC
-  - key: sto
-    label: Send to Online
-  - key: por
-    label: Pending Online Review
-  - key: sndwip
-    label: Send WIP
 
 shot_to_task:
   omt:
@@ -144,23 +127,15 @@ task_to_shot:
     - actv
   bfr:
     - actv
-  stcomp:
-    - actv
   cnv:
+    - actv
+  stcomp:
     - actv
   sndcli:
     - actv
   adn:
     - actv
   qckbk:
-    - actv
-  rff:
-    - actv
-  rqc:
-    - actv
-  sto:
-    - actv
-  por:
     - actv
   rev:
     - rev
@@ -172,29 +147,21 @@ task_to_shot:
 version_to_task:
   cnv:
     - cnv
-  sndcli:
-    - sndcli
   bkdn:
     - adn
+  stcomp:
+    - stcomp
+  sndwip:
+    - sndcli
+  sndcli:
+    - sndcli
   qckbk:
     - qckbk
   rev:
     - rev
   note:
     - adn
-  stcomp:
-    - stcomp
   hero:
     - apv
   apv:
     - apv
-  rff:
-    - rff
-  rqc:
-    - rqc
-  sto:
-    - sto
-  por:
-    - por
-  sndwip:
-    - sndcli

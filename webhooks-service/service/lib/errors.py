@@ -21,7 +21,3 @@ class ProjectNotFoundError(BakedError):
 
     def __str__(self):
         return f"Could not find project: {self.project_name}"
-
-
-class GoogleCredentialsNotFoundError(BakedError):
-    pass
