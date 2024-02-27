@@ -1,0 +1,217 @@
+"""
+A module for interacting with the Shotgrid API.
+"""
+import os
+import logging
+
+import shotgun_api3
+
+from errors import APIKeyNotFoundError, ProjectNotFoundError
+
+# Configure logging at the beginning of your script
+logging.basicConfig(level=logging.INFO)
+
+API_KEY_ENV_VAR_NAME = "SHOTGRID_API_KEY"
+_HOSTNAME = "https://baked.shotgunstudio.com"
+_SCRIPT_NAME = "baked-tools"
+
+
+class SG:
+    def __init__(self, hostname=_HOSTNAME, api_key=None):
+        self._hostname = hostname
+
+        try:
+            self._api_key = (
+                api_key or os.environ[API_KEY_ENV_VAR_NAME]
+            )
+        except KeyError as e:
+            raise APIKeyNotFoundError(API_KEY_ENV_VAR_NAME) from e
+
+        self._api = shotgun_api3.Shotgun(
+            self._hostname,
+            script_name=_SCRIPT_NAME,
+            api_key=self._api_key,
+        )
+
+    def list_all_projects(self):
+        return self._api.find("Project", [], ["id", "name"])
+
+    def resolve_project_id(self, name):
+        projects = { p["name"].lower(): p for p in self.list_all_projects() }
+
+        if name.lower() not in projects:
+            raise ProjectNotFoundError(
+                name, list(p["name"] for p in projects.values()),
+            )
+
+        return projects[name.lower()]["id"]
+
+    def find_shot(self, shot_id):
+        return self._api.find_one(
+            "Shot",
+            [["id", "is", shot_id]],
+            [
+                "id",
+                "cached_display_name",
+                "project",
+                "code",
+                "created_at",
+                "created_by",
+                "updated_at",
+                "updated_by",
+                "description",
+                "user",
+                "sg_status_list",
+                "tasks",
+            ]
+        )
+
+    def find_shot_by_task(self, task_id):
+        return self._api.find_one(
+            "Shot",
+            [["tasks", "is", { "type": "Task", "id": task_id }]],
+            [
+                "id",
+                "cached_display_name",
+                "project",
+                "code",
+                "created_at",
+                "created_by",
+                "updated_at",
+                "updated_by",
+                "description",
+                "user",
+                "sg_status_list",
+                "tasks",
+            ]
+        )
+
+    def list_shots(self, project_id):
+        return self._api.find(
+            "Shot",
+            [["project", "is", { "type": "Project", "id": project_id }]],
+            [
+                "id",
+                "cached_display_name",
+                "project",
+                "code",
+                "sg_status_list",
+                "sg_turnover_notes",
+                "sg_delivery_notes",
+                "created_at",
+                "created_by",
+                "updated_at",
+                "updated_by",
+                "description",
+                "sg_latest_version",
+                "sg_versions",
+                "version_sg_link_to_shot_versions",
+                "user",
+            ],
+        )
+
+    def find_task(self, task_id):
+        return self._api.find_one(
+            "Task",
+            [["id", "is", task_id]],
+            [
+                "id",
+                "cached_display_name",
+                "project",
+                "code",
+                "created_at",
+                "created_by",
+                "updated_at",
+                "updated_by",
+                "sg_status_list",
+                "sg_versions",
+                "sg_latest_version",
+                "sg_shot_code",
+            ]
+        )
+
+    def find_version(self, version_id):
+        return self._api.find_one(
+            "Version",
+            [["id", "is", version_id]],
+            [
+                "id",
+                "cached_display_name",
+                "project",
+                "created_at",
+                "created_by",
+                "updated_at",
+                "updated_by",
+                "sg_status_list",
+                "sg_link_to_shot",
+                "sg_task",
+            ]
+        )
+
+    def find_tasks(self, task_ids):
+        assert task_ids
+
+        filters = [{
+            "filter_operator": "any",
+            "filters": [["id", "is", task_id] for task_id in task_ids]
+        }]
+        return self._api.find(
+            "Task",
+            filters,
+            [
+                "id",
+                "project",
+                "cached_display_name",
+                "sg_status_list",
+            ])
+
+    def set_task_status(self, task_ids, new_status):
+        batch_data = [
+            {
+                "request_type": "update",
+                "entity_type": "Task",
+                "entity_id": task_id,
+                "data": {
+                    "sg_status_list": new_status,
+                }
+            }
+            for task_id in task_ids
+        ]
+        return self._api.batch(batch_data)
+
+    def set_shot_status(self, shot_id, new_status):
+        data = {
+            "sg_status_list": new_status,
+        }
+        return self._api.update("Shot", shot_id, data)
+
+    def set_version_status(self, version_id, new_status):
+        data = {
+            "sg_status_list": new_status,
+        }
+        return self._api.update("Version", version_id, data)
+
+
+def update_linked_shot(project_id, task_id, valid_shot_statuses):
+    sg = SG()
+    shot = sg.find_shot_by_task(task_id)
+
+    if shot["sg_status_list"] in valid_shot_statuses:
+        return shot, None
+    else:
+        updated_shot = sg.set_shot_status(shot["id"], valid_shot_statuses[0])
+        return shot, updated_shot
+
+
+def update_linked_task(project_id, version_id, valid_task_statuses):
+    sg = SG()
+    version = sg.find_version(version_id)
+
+    task_id = version["sg_task"]["id"]
+    task = sg.find_task(task_id)
+
+    if task["sg_status_list"] in valid_task_statuses:
+        return task, None
+    else:
+        updated_tasks = sg.set_task_status([task_id], valid_task_statuses[0])
+        return task, updated_tasks[0]
